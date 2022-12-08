@@ -1,12 +1,13 @@
 #include "Triangle.hpp"
 #include "rasterizer.hpp"
+#include <cmath>
 #include <eigen3/Eigen/Eigen>
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
 
-// #define RenderMainLoop
+#define RenderMainLoop
 
 
 constexpr double MY_PI = 3.1415926;
@@ -31,7 +32,15 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
     // TODO: Implement this function
     // Create the model matrix for rotating the triangle around the Z axis.
     // Then return it.
+    float rad = rotation_angle / 180.0 * MY_PI;
+    float A = std::cos(rad), B = std::sin(rad);
+    model(0, 0) =  A;
+    model(0, 1) = -B;
+    model(1, 1) =  A;
+    model(1, 0) =  B;
 
+    // std::cout << "model mat:\n" << model << '\n';
+    
     return model;
 }
 
@@ -45,6 +54,7 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
     // TODO: Implement this function
     // Create the projection matrix for the given parameters.
     // Then return it.
+    std::cout << "M_proj:\n" << projection << '\n';
 
     return projection;
 }
@@ -92,12 +102,6 @@ int main(int argc, const char** argv)
 
         return 0;
     }
-
-
-    auto m = get_model_matrix(30);
-    std::cout << m << '\n';
-
-
 
 #ifdef RenderMainLoop
     while (key != 27) {     // ESC is not pressed
