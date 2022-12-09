@@ -6,10 +6,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
-
-#define RenderMainLoop
-
-
 constexpr double MY_PI = 3.1415926;
 
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
@@ -29,7 +25,7 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
     Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
 
-    // TODO: Implement this function
+    // DONE: Implement this function
     // Create the model matrix for rotating the triangle around the Z axis.
     // Then return it.
     float rad = rotation_angle / 180.0 * MY_PI;
@@ -39,7 +35,7 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
     model(1, 1) =  A;
     model(1, 0) =  B;
 
-    // std::cout << "model mat:\n" << model << '\n';
+    std::cout << "M_model:\n" << model << '\n';
     
     return model;
 }
@@ -49,14 +45,28 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 {
     // Students will implement this function
 
-    Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f projection;
 
     // TODO: Implement this function
     // Create the projection matrix for the given parameters.
     // Then return it.
-    std::cout << "M_proj:\n" << projection << '\n';
+
+    projection << zNear, 0, 0, 0,
+                  0, zNear, 0, 0,
+                  0, 0, zNear+zFar, -zNear*zFar,
+                  0, 0, 1, 0;
+
+    std::cout << "M_presp->ortho:\n" << projection << '\n';
 
     return projection;
+}
+
+Eigen::Matrix4f get_rotation(Eigen::Vector3f axis, float angle) {
+    // 提高题：该函数的作用是得到绕任意过原点的轴的旋转变换矩阵。 
+    Eigen::Matrix4f rotation = Eigen::Matrix4f::Identity();
+
+
+    return rotation;
 }
 
 int main(int argc, const char** argv)
@@ -75,7 +85,7 @@ int main(int argc, const char** argv)
 
     rst::rasterizer r(700, 700);
 
-    Eigen::Vector3f eye_pos = {0, 0, 5};
+    Eigen::Vector3f eye_pos = {0, 0, 1};
 
     std::vector<Eigen::Vector3f> pos{{2, 0, -2}, {0, 2, -2}, {-2, 0, -2}};
 
@@ -103,7 +113,6 @@ int main(int argc, const char** argv)
         return 0;
     }
 
-#ifdef RenderMainLoop
     while (key != 27) {     // ESC is not pressed
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
@@ -127,7 +136,6 @@ int main(int argc, const char** argv)
             angle -= 10;
         }
     }
-#endif
 
     return 0;
 }
