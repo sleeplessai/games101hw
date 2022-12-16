@@ -25,9 +25,6 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
     Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
 
-    // DONE: Implement this function
-    // Create the model matrix for rotating the triangle around the Z axis.
-    // Then return it.
     float rad = rotation_angle / 180.0 * MY_PI;
     float A = std::cos(rad), B = std::sin(rad);
     model(0, 0) =  A;
@@ -35,30 +32,39 @@ Eigen::Matrix4f get_model_matrix(float rotation_angle)
     model(1, 1) =  A;
     model(1, 0) =  B;
 
-    std::cout << "M_model:\n" << model << '\n';
-    
     return model;
 }
+
 
 Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
                                       float zNear, float zFar)
 {
-    // Students will implement this function
+    float n = zNear, f = zFar;
+    float fovy = eye_fov / 180.0 * MY_PI;
+    float t = std::abs(n) * std::tan(fovy / 2);
+    float b = -t;
+    float r = t * aspect_ratio;     // aspect=r/t;
+    float l = -r;
 
-    Eigen::Matrix4f projection;
-
-    // TODO: Implement this function
-    // Create the projection matrix for the given parameters.
-    // Then return it.
-
-    projection << zNear, 0, 0, 0,
-                  0, zNear, 0, 0,
-                  0, 0, zNear+zFar, -zNear*zFar,
-                  0, 0, 1, 0;
-
-    std::cout << "M_presp->ortho:\n" << projection << '\n';
-
-    return projection;
+    Eigen::Matrix4f ortho_t, ortho_s, persp_to_ortho;
+    // persp = ortho * persp_to_ortho
+    
+    ortho_s << 2/(r-l), 0, 0, 0,
+               0, 2/(t-b), 0, 0,
+               0, 0, 2/(n-f), 0,
+               0, 0, 0, 1;
+    // std::cout << "os:" << ortho_s << std::endl;
+    ortho_t << 1, 0, 0, -(r+l)/2,
+               0, 1, 0, -(t+b)/2,
+               0, 0, 1, -(n+f)/2,
+               0, 0, 0, 1;
+    // std::cout << "ot:" << ortho_t << std::endl;
+    persp_to_ortho << n, 0, 0, 0,
+                      0, n, 0, 0,
+                      0, 0, n+f, -n*f,
+                      0, 0, 1, 0;
+    //std::cout << persp_to_ortho << std::endl;
+    return ortho_s * ortho_t * persp_to_ortho;
 }
 
 Eigen::Matrix4f get_rotation(Eigen::Vector3f axis, float angle) {
@@ -85,7 +91,7 @@ int main(int argc, const char** argv)
 
     rst::rasterizer r(700, 700);
 
-    Eigen::Vector3f eye_pos = {0, 0, 1};
+    Eigen::Vector3f eye_pos = {0, 0, 5};
 
     std::vector<Eigen::Vector3f> pos{{2, 0, -2}, {0, 2, -2}, {-2, 0, -2}};
 
