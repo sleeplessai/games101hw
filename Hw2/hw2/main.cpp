@@ -12,7 +12,8 @@
 #define TICK(x) auto bench_##x = std::chrono::steady_clock::now();
 #define TOCK(x) std::printf("%s: %lfs\n", #x, std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now() - bench_##x).count());
 
-constexpr double MY_PI = 3.1415926;
+// constexpr double MY_PI = 3.1415926;
+const float Pi = std::acos(-1);
 
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 {
@@ -31,14 +32,14 @@ Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 
 Eigen::Matrix4f get_model_matrix(float rotation_angle)
 {
-    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+    Eigen::Matrix4f model; // = Eigen::Matrix4f::Identity();
+    float rad = rotation_angle / 180.0 * Pi;
+    float c = std::cos(rad), s = std::sin(rad);
 
-    float rad = rotation_angle / 180.0 * MY_PI;
-    float A = std::cos(rad), B = std::sin(rad);
-    model(0, 0) =  A;
-    model(0, 1) = -B;
-    model(1, 1) =  A;
-    model(1, 0) =  B;
+    model << c, s, 0, 0,
+            -s, c, 0 ,0,
+             0, 0, 1, 0,
+             0, 0, 0, 1;
 
     return model;
 }
@@ -47,7 +48,7 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
                                       float zNear, float zFar)
 {
     float n = zNear, f = zFar;
-    float fovy = eye_fov / 180.0 * MY_PI;
+    float fovy = eye_fov / 180.0 * Pi;
     float t = std::abs(n) * std::tan(fovy / 2);
     float b = -t;
     float r = t * aspect_ratio;     // aspect=r/t;

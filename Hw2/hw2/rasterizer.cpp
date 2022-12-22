@@ -7,14 +7,8 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <eigen3/Eigen/src/Core/GlobalFunctions.h>
-#include <eigen3/Eigen/src/Core/Matrix.h>
-#include <opencv2/core/matx.hpp>
-#include <opencv2/stitching/detail/seam_finders.hpp>
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include <math.h>
-
 
 rst::pos_buf_id rst::rasterizer::load_positions(const std::vector<Eigen::Vector3f> &positions)
 {
